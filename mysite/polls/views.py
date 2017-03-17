@@ -7,10 +7,16 @@
 # Each view is responsible for doing one of two things
 # 1) return an HttpResponse object containing the content for the requested page, or
 # 2) raise an exception, ex. Http404
-from django.http import HttpResponse                   # each view either return a HttpResponse or raise an exception
-from .models import Question
-from django.template import loader                     # used to load a template file
-from django.shortcuts import render, get_object_or_404 # shortcut methods for common use cases
+# Generic views:
+#   Django provides a shortcut, called the "generic views" system, for common case of basic Web development
+#   1) getting data from the database according to a parameter passed in the URL
+#   2) loading a template
+#   3) returning the rendered template
+from django.http import HttpResponse, HttpResponseRedirect # each view either return a HttpResponse or raise an exception
+from django.template import loader                         # used to load a template file
+from django.shortcuts import render, get_object_or_404     # shortcut methods for common use cases
+from django.urls import reverse
+from .models import Choice, Question 
 
 # Create your views here.
 def index(request):
@@ -45,8 +51,45 @@ def detail(request, question_id):
     return render(request, 'polls/detail.html', {'question': question})
 
 def results(request, question_id):
-    response = "You're looking at the results of question %s."
-    return HttpResponse(response % question_id)
+    # the vote() view redirects to here, showing the results page for the question
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, 'polls/results.html', {'question': question})
 
+# 1) gets the selected_choice object from the database
+# 2) computes the new value of votes
+# 3) saves it back to the database
+# problem: race condition
+#   if two users (i.e. two Python threads) of your website try to vote at exactly the same time, this might go wrong
+#   ex. two users save the new value of 43, but it should be 44 
+# solution:
+#   using F()
 def vote(request, question_id):
-    return HttpResponse("You're voting on question %s." % question_id)
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        # 1) request.POST:
+        #    a dictionary-like object that lets you access submitted data by key name
+        #    i.e. request.POST['choice'] returns the ID of the selected choice, as a string
+        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+    except (KeyError, Choice.DoesNotExist):
+        #    it will raise KeyError if choice wasn't provided in POST data
+        # 2) Redisplay the question voting form.
+        return render(
+            request,
+            'polls/detail.html',
+            {
+                'question': question,
+                'error_message': "You didn't select a choice.",
+            }
+        )
+    else:
+        selected_choice.votes += 1
+        selected_choice.save()
+        # HttpResponseRedirect([url]):
+        #   it takes a argument, the URL, to which the user will be redirected 
+        # reverse() function:
+        #   the function helps avoid having to hardcode a URL in the view function
+        #   ex. the following reverse() method returns: '/polls/3/results/', where 3 is value of question.id
+        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        # note: always return an HttpResponseRedirect after successfully dealing
+        #       with POST data. This prevents data from being posted twice if a
+        #       user hits the Back button.

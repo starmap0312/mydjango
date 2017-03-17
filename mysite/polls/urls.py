@@ -7,6 +7,12 @@ from . import views
 #     instead of:
 #     /ME2/Sites/dirmod.asp?sid=&type=gen&mod=Core+Pages&gid=A6CD4967199A42D9B65B1B
 
+# 1) add an app_name to set the application namespace
+#    ex. app_name = 'polls'
+# 2) then we can specify the namespaced view in template
+#    ex. <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+app_name = 'polls'
+
 urlpatterns = [
     # ex: /polls/
     url(r'^$', views.index, name='index'),
