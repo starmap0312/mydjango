@@ -1,0 +1,6 @@
+# run shell: (django-admin shell)
+python manage.py shell
+# run server
+python manage.py runserver
+# run tests
+python manage.py test polls
