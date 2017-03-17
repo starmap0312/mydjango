@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'polls.apps.PollsConfig',                # added a new app config for facilitating its model defintion 
+    'polls.apps.PollsConfig',                # added a new app config to facilitate its model defintion 
+    'polls_generic.apps.PollsConfig',                # added a new app config to facilitate its model defintion 
 ]
 
 MIDDLEWARE = [

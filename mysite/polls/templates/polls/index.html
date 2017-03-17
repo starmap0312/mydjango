@@ -1,0 +1,16 @@
+<!-- template variable: latest_question_list is mapped to an Python object (ex. list) 
+     based on the context (mapping) passed-in by the view
+-->
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+        <!-- use name defined in view.py to remove the hardcoded URLs
+        <li><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></li>
+        can be written as
+        -->
+        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
