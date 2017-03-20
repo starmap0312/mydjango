@@ -14,3 +14,8 @@
 {% else %}
     <p>No polls are available.</p>
 {% endif %}
+
+{% load static %}
+
+<!-- the "static" template tag generates the absolute URL of static files -->
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
