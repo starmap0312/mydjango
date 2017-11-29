@@ -25,7 +25,7 @@ class DetailView(generic.DetailView):
     # note:
     #   it expects the primary key value captured from the URL to be called "pk"
     #   so we've changed question_id to pk for the generic views
-    # the question variable is provided automatically, since we’re using a Django model (Question)
+    # the question variable is provided automatically, since we are using a Django model (Question)
 
 class ResultsView(generic.DetailView):
     model = Question
